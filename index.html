@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>情绪可视化测试</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #8B5CF6;
+      --secondary: #EC4899;
+      --accent: #F472B6;
+      --background: #FEF7FF;
+      --text: #333333;
+      --lightText: #666666;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    .pulse-slow {
+      animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    /* 首页样式 */
+    .home-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .home-content {
+      max-width: 600px;
+      text-align: center;
+    }
+
+    .home-content h1 {
+      font-size: 2.5rem;
+      font-weight: 300;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+
+    .home-content p {
+      font-size: 1.25rem;
+      color: var(--lightText);
+      margin-bottom: 48px;
+      line-height: 1.6;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 32px;
+      border-radius: 50px;
+      font-size: 1.125rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      color: white;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
+    }
+
+    .btn-secondary {
+      border: 1px solid #e2e8f0;
+      color: var(--text);
+      background: white;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--primary);
+      box-shadow: 0 2px 8px rgba(139, 92, 246, 0.1);
+    }
+
+    /* 测试页样式 */
+    .test-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 40px 20px;
+    }
+
+    .progress-container {
+      max-width: 600px;
+      margin: 0 auto 32px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 0.875rem;
+      color: var(--lightText);
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: #f1f5f9;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+
+    .question-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .question-content {
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .question-content h2 {
+      font-size: 1.875rem;
+      font-weight: 300;
+      color: var(--text);
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .option-item {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .option-item:hover {
+      border-color: var(--primary);
+      box-shadow: 0 2px 8px rgba(139, 92, 246, 0.1);
+    }
+
+    .option-item.selected {
+      border-color: var(--primary);
+      background: linear-gradient(to right, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.1));
+    }
+
+    .option-radio {
+      width: 24px;
+      height: 24px;
+      border: 2px solid #cbd5e1;
+      border-radius: 50%;
+      margin-right: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .option-item.selected .option-radio {
+      border-color: var(--primary);
+      background: var(--primary);
+    }
+
+    .option-radio-inner {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: white;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .option-item.selected .option-radio-inner {
+      opacity: 1;
+    }
+
+    .navigation-container {
+      max-width: 600px;
+      margin: 32px auto 0;
+    }
+
+    /* 加载页样式 */
+    .loading-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .loading-content {
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .loading-spinner {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 32px;
+      position: relative;
+    }
+
+    .loading-circle {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 4px solid rgba(139, 92, 246, 0.2);
+      border-radius: 50%;
+      animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    .loading-circle:nth-child(2) {
+      top: 8px;
+      left: 8px;
+      border-color: rgba(139, 92, 246, 0.4);
+      animation-delay: 0.5s;
+    }
+
+    .loading-circle:nth-child(3) {
+      top: 16px;
+      left: 16px;
+      border-color: rgba(139, 92, 246, 0.6);
+      animation-delay: 1s;
+    }
+
+    .loading-content p {
+      font-size: 1.25rem;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+
+    .loading-content p:last-child {
+      font-size: 1.125rem;
+      color: var(--lightText);
+      margin-bottom: 0;
+    }
+
+    /* 结果页样式 */
+    .result-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .result-content {
+      max-width: 800px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .result-content h1 {
+      font-size: 1.875rem;
+      font-weight: 300;
+      color: var(--text);
+      margin-bottom: 32px;
+    }
+
+    .result-image {
+      width: 100%;
+      aspect-ratio: 16/9;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      margin-bottom: 32px;
+    }
+
+    .result-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .result-description {
+      text-align: left;
+      margin-bottom: 32px;
+      line-height: 1.6;
+      color: var(--text);
+    }
+
+    .result-tags {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 48px;
+    }
+
+    .result-tag {
+      padding: 8px 16px;
+      border-radius: 50px;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .result-tag:nth-child(1) {
+      background: rgba(139, 92, 246, 0.1);
+      color: var(--primary);
+    }
+
+    .result-tag:nth-child(2) {
+      background: rgba(236, 72, 153, 0.1);
+      color: var(--secondary);
+    }
+
+    .result-tag:nth-child(3) {
+      background: rgba(244, 114, 182, 0.1);
+      color: var(--accent);
+    }
+
+    .result-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    @media (min-width: 768px) {
+      .result-buttons {
+        flex-direction: row;
+        justify-content: center;
+      }
+
+      .result-buttons .btn {
+        flex: 1;
+        max-width: 200px;
+      }
+    }
+
+    /* 隐藏页面 */
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <!-- 首页 -->
+  <div id="home" class="page active home-page">
+    <div class="home-content fade-in">
+      <h1>12个问题，生成你的内心图景</h1>
+      <p>把说不清的情绪，变成一张图</p>
+      <button class="btn btn-primary" onclick="showPage('test')">
+        开始测试 →
+      </button>
+    </div>
+  </div>
+
+  <!-- 测试页 -->
+  <div id="test" class="page test-page">
+    <div class="progress-container">
+      <div class="progress-header">
+        <span id="progress-text">1/12</span>
+        <span>情绪测试</span>
+      </div>
+      <div class="progress-bar">
+        <div id="progress-fill" class="progress-fill" style="width: 8.33%;"></div>
+      </div>
+    </div>
+
+    <div class="question-container">
+      <div class="question-content fade-in">
+        <h2 id="question-text">当你感到压力时，你会选择哪种方式放松？</h2>
+        <div class="options-list">
+          <div class="option-item" onclick="selectOption(0, 0)">
+            <div class="option-radio">
+              <div class="option-radio-inner"></div>
+            </div>
+            <span>听音乐</span>
+          </div>
+          <div class="option-item" onclick="selectOption(0, 1)">
+            <div class="option-radio">
+              <div class="option-radio-inner"></div>
+            </div>
+            <span>散步</span>
+          </div>
+          <div class="option-item" onclick="selectOption(0, 2)">
+            <div class="option-radio">
+              <div class="option-radio-inner"></div>
+            </div>
+            <span>冥想</span>
+          </div>
+          <div class="option-item" onclick="selectOption(0, 3)">
+            <div class="option-radio">
+              <div class="option-radio-inner"></div>
+            </div>
+            <span>与朋友聊天</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="navigation-container">
+      <button id="prev-btn" class="btn btn-secondary" onclick="prevQuestion()" disabled>
+        上一题
+      </button>
+    </div>
+  </div>
+
+  <!-- 加载页 -->
+  <div id="loading" class="page loading-page">
+    <div class="loading-content fade-in">
+      <div class="loading-spinner">
+        <div class="loading-circle"></div>
+        <div class="loading-circle"></div>
+        <div class="loading-circle"></div>
+      </div>
+      <p>正在整理你的情绪线索……</p>
+      <p>正在生成你的内心图景……</p>
+    </div>
+  </div>
+
+  <!-- 结果页 -->
+  <div id="result" class="page result-page">
+    <div class="result-content fade-in">
+      <h1>你的内心图景</h1>
+      <div class="result-image">
+        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=soft%20pastel%20color%20abstract%20emotional%20landscape%20with%20gentle%20curves%20and%20flowing%20shapes&image_size=landscape_16_9" alt="内心图景">
+      </div>
+      <div class="result-description">
+        <p>你的内心是一片宁静的海洋，既有温柔的波浪，也有深邃的思考。你善于感受生活中的美好，同时也能理性面对挑战。你的情绪世界丰富而细腻，像一幅柔和的水彩画，既有明亮的色彩，也有沉静的色调。你重视内心的平衡与和谐，追求一种从容不迫的生活态度。</p>
+      </div>
+      <div class="result-tags">
+        <span class="result-tag">宁静</span>
+        <span class="result-tag">细腻</span>
+        <span class="result-tag">平衡</span>
+      </div>
+      <div class="result-buttons">
+        <button class="btn btn-secondary" onclick="showPage('home')">
+          重新测试
+        </button>
+        <button class="btn btn-primary">
+          换一种画风
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 问题数据
+    const questions = [
+      {
+        id: 1,
+        question: '当你感到压力时，你会选择哪种方式放松？',
+        options: [
+          '听音乐',
+          '散步',
+          '冥想',
+          '与朋友聊天'
+        ]
+      },
+      {
+        id: 2,
+        question: '你最喜欢的天气是？',
+        options: [
+          '晴天',
+          '雨天',
+          '多云',
+          '雪天'
+        ]
+      },
+      {
+        id: 3,
+        question: '你理想的周末是怎样的？',
+        options: [
+          '宅在家休息',
+          '户外活动',
+          '与朋友聚会',
+          '学习或工作'
+        ]
+      },
+      {
+        id: 4,
+        question: '当你感到悲伤时，你会？',
+        options: [
+          '独处',
+          '寻求安慰',
+          '做些事情分散注意力',
+          '反思原因'
+        ]
+      },
+      {
+        id: 5,
+        question: '你最喜欢的颜色是？',
+        options: [
+          '温暖的色调（红、橙、黄）',
+          '冷静的色调（蓝、绿）',
+          '中性色调（黑、白、灰）',
+          '鲜艳的色调（紫、粉）'
+        ]
+      },
+      {
+        id: 6,
+        question: '你认为自己是一个？',
+        options: [
+          '外向的人',
+          '内向的人',
+          '介于两者之间',
+          '根据情况变化'
+        ]
+      },
+      {
+        id: 7,
+        question: '你喜欢的音乐类型是？',
+        options: [
+          '流行音乐',
+          '古典音乐',
+          '摇滚音乐',
+          '电子音乐'
+        ]
+      },
+      {
+        id: 8,
+        question: '你最看重的品质是？',
+        options: [
+          '诚实',
+          '善良',
+          '智慧',
+          '勇气'
+        ]
+      },
+      {
+        id: 9,
+        question: '你面对挑战时的态度是？',
+        options: [
+          '勇敢面对',
+          '谨慎思考',
+          '寻求帮助',
+          '回避'
+        ]
+      },
+      {
+        id: 10,
+        question: '你喜欢的季节是？',
+        options: [
+          '春天',
+          '夏天',
+          '秋天',
+          '冬天'
+        ]
+      },
+      {
+        id: 11,
+        question: '你理想的居住环境是？',
+        options: [
+          '城市',
+          '郊区',
+          '乡村',
+          '海边'
+        ]
+      },
+      {
+        id: 12,
+        question: '当你完成一件重要的事情时，你会？',
+        options: [
+          '庆祝',
+          '反思',
+          '休息',
+          '开始下一件事'
+        ]
+      }
+    ];
+
+    // 状态管理
+    let currentQuestion = 0;
+    let answers = Array(questions.length).fill(-1);
+
+    // 显示指定页面
+    function showPage(pageId) {
+      // 隐藏所有页面
+      document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+      });
+      // 显示目标页面
+      document.getElementById(pageId).classList.add('active');
+    }
+
+    // 选择选项
+    function selectOption(questionIndex, optionIndex) {
+      // 更新答案
+      answers[questionIndex] = optionIndex;
+      
+      // 更新选项状态
+      const options = document.querySelectorAll('.option-item');
+      options.forEach((option, index) => {
+        if (index === optionIndex) {
+          option.classList.add('selected');
+        } else {
+          option.classList.remove('selected');
+        }
+      });
+
+      // 自动进入下一题
+      if (currentQuestion < questions.length - 1) {
+        setTimeout(() => {
+          nextQuestion();
+        }, 500);
+      } else {
+        // 测试完成，跳转到加载页
+        showPage('loading');
+        
+        // 3秒后跳转到结果页
+        setTimeout(() => {
+          showPage('result');
+        }, 3000);
+      }
+    }
+
+    // 下一题
+    function nextQuestion() {
+      if (currentQuestion < questions.length - 1) {
+        currentQuestion++;
+        updateQuestion();
+      }
+    }
+
+    // 上一题
+    function prevQuestion() {
+      if (currentQuestion > 0) {
+        currentQuestion--;
+        updateQuestion();
+      }
+    }
+
+    // 更新问题
+    function updateQuestion() {
+      // 更新问题文本
+      document.getElementById('question-text').textContent = questions[currentQuestion].question;
+      
+      // 更新选项
+      const optionsList = document.querySelector('.options-list');
+      optionsList.innerHTML = '';
+      
+      questions[currentQuestion].options.forEach((option, index) => {
+        const optionItem = document.createElement('div');
+        optionItem.className = `option-item ${answers[currentQuestion] === index ? 'selected' : ''}`;
+        optionItem.onclick = () => selectOption(currentQuestion, index);
+        optionItem.innerHTML = `
+          <div class="option-radio">
+            <div class="option-radio-inner"></div>
+          </div>
+          <span>${option}</span>
+        `;
+        optionsList.appendChild(optionItem);
+      });
+      
+      // 更新进度
+      const progressPercent = ((currentQuestion + 1) / questions.length) * 100;
+      document.getElementById('progress-fill').style.width = `${progressPercent}%`;
+      document.getElementById('progress-text').textContent = `${currentQuestion + 1}/${questions.length}`;
+      
+      // 更新上一题按钮状态
+      document.getElementById('prev-btn').disabled = currentQuestion === 0;
+    }
+  </script>
+</body>
+</html>
