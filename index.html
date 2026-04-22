@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>语言沙盘</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif; 
+      background: linear-gradient(135deg, #fff5f5 0%, #fef3f0 50%, #fdf8f6 100%); 
+      min-height: 100vh;
+    }
+    .page { display: none; min-height: 100vh; }
+    .page.active { display: flex; }
+    .fade-in { animation: fadeIn 0.6s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    .btn { padding: 16px 36px; border-radius: 50px; font-size: 16px; cursor: pointer; transition: all 0.3s; border: none; font-weight: 400; }
+    .btn-primary { 
+      background: linear-gradient(135deg, #ffb5c5 0%, #ff9eb5 100%); 
+      color: white; 
+      box-shadow: 0 8px 25px rgba(255, 155, 181, 0.35); 
+    }
+    .btn-primary:hover { 
+      transform: translateY(-3px) scale(1.02); 
+      box-shadow: 0 12px 35px rgba(255, 155, 181, 0.45); 
+    }
+    .btn-secondary { 
+      background: white; 
+      color: #a78b9a; 
+      border: 2px solid #f5e6ea;
+    }
+    .btn-secondary:hover { 
+      background: #fff5f7; 
+      border-color: #ffb5c5;
+      color: #e8839f;
+    }
+    .option-item { 
+      display: flex; 
+      align-items: flex-start; 
+      padding: 16px 20px; 
+      border-radius: 20px; 
+      cursor: pointer; 
+      transition: all 0.3s; 
+      background: white; 
+      border: 2px solid transparent;
+    }
+    .option-item:hover { 
+      border-color: #ffb5c5; 
+      background: linear-gradient(135deg, rgba(255,181,197,0.08) 0%, rgba(255,158,181,0.05) 100%);
+      transform: translateX(4px);
+    }
+    .option-item.selected { 
+      border-color: #ff8fb3;
+      background: linear-gradient(135deg, rgba(255,181,197,0.15) 0%, rgba(255,158,181,0.1) 100%);
+      box-shadow: 0 4px 15px rgba(255,155,181,0.15);
+    }
+    .option-radio { 
+      width: 24px; 
+      height: 24px; 
+      border-radius: 50%; 
+      border: 2.5px solid #e0c8d3; 
+      margin-right: 14px; 
+      flex-shrink: 0; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      margin-top: 1px;
+      transition: all 0.3s;
+    }
+    .option-item.selected .option-radio { 
+      border-color: #ff8fb3; 
+      background: linear-gradient(135deg, #ff8fb3 0%, #ff6b9d 100%);
+      box-shadow: 0 2px 8px rgba(255,111,157,0.3);
+    }
+    .option-radio-inner { 
+      width: 10px; 
+      height: 10px; 
+      border-radius: 50%; 
+      background: white; 
+      opacity: 0; 
+      transition: opacity 0.2s;
+    }
+    .option-item.selected .option-radio-inner { opacity: 1; }
+    .progress-bar { height: 8px; background: #f5e6ea; border-radius: 10px; overflow: hidden; }
+    .progress-fill { 
+      height: 100%; 
+      background: linear-gradient(90deg, #ffb5c5 0%, #ff8fb3 50%, #ff6b9d 100%); 
+      border-radius: 10px; 
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .result-tag { 
+      display: inline-block; 
+      padding: 8px 18px; 
+      border-radius: 25px; 
+      background: white; 
+      border: 1px solid #f5e6ea; 
+      font-size: 13px; 
+      color: #a78b9a;
+    }
+    .loading-spinner { display: flex; gap: 12px; margin-bottom: 28px; justify-content: center; }
+    .loading-circle { 
+      width: 16px; 
+      height: 16px; 
+      border-radius: 50%; 
+      background: linear-gradient(135deg, #ffb5c5 0%, #ff8fb3 100%); 
+      animation: pulse 1.4s ease-in-out infinite; 
+    }
+    .loading-circle:nth-child(2) { animation-delay: 0.2s; }
+    .loading-circle:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes pulse { 0%, 100% { opacity: 0.4; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.1); } }
+    textarea { font-family: inherit; }
+    
+    .card-shadow {
+      box-shadow: 0 10px 40px rgba(180, 140, 160, 0.12);
+    }
+    
+    .cute-decoration {
+      position: absolute;
+      opacity: 0.15;
+      pointer-events: none;
+    }
+    
+    .floating {
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .gradient-text {
+      background: linear-gradient(135deg, #e8839f 0%, #c47d8e 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #fdf5f5; }
+    ::-webkit-scrollbar-thumb { background: #f5d0d8; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #ffb5c5; }
+  </style>
+</head>
+<body>
+  <!-- 装饰元素 -->
+  <div class="cute-decoration" style="top: 10%; left: 5%; width: 80px; height: 80px; background: radial-gradient(circle, #ffb5c5 0%, transparent 70%); border-radius: 50%;"></div>
+  <div class="cute-decoration" style="top: 60%; right: 8%; width: 120px; height: 120px; background: radial-gradient(circle, #c5e8ff 0%, transparent 70%); border-radius: 50%;"></div>
+  <div class="cute-decoration" style="bottom: 15%; left: 10%; width: 60px; height: 60px; background: radial-gradient(circle, #ffe5c5 0%, transparent 70%); border-radius: 50%;"></div>
+
+  <!-- 首页 -->
+  <div id="home" class="page active">
+    <div class="flex-1 flex items-center justify-center p-6">
+      <div class="max-w-xl text-center fade-in">
+        <div class="mb-8">
+          <div class="text-5xl mb-4 floating">🌸</div>
+        </div>
+        <h1 class="text-3xl md:text-4xl font-light mb-4 gradient-text">语言沙盘</h1>
+        <p class="text-lg text-gray-500 mb-2" style="color: #b8a5b0;">20个问题，生成你的内心图景</p>
+        <p class="text-base text-gray-400 mb-12" style="color: #c9b8c1;">把说不清的情绪，变成一段温柔的视觉语言</p>
+        <button class="btn btn-primary" onclick="showPage('test')">
+          开始探索 →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 测试页 -->
+  <div id="test" class="page">
+    <div class="flex-1 flex flex-col p-6 max-w-2xl mx-auto w-full">
+      <div class="mb-6">
+        <div class="flex justify-between items-center mb-3">
+          <span id="progress-text" class="text-sm font-medium" style="color: #c9a5b1;">1/20</span>
+          <span class="text-xs" style="color: #d4c4cb;">语言沙盘</span>
+        </div>
+        <div class="progress-bar">
+          <div id="progress-fill" class="progress-fill" style="width: 5%;"></div>
+        </div>
+      </div>
+      
+      <div class="flex-1 flex flex-col items-center justify-center">
+        <div class="max-w-xl w-full fade-in card-shadow bg-white rounded-3xl p-6 md:p-8" style="box-shadow: 0 10px 40px rgba(180, 140, 160, 0.1);">
+          <div id="question-container"></div>
+        </div>
+      </div>
+      
+      <div class="mt-6">
+        <button id="prev-btn" class="btn btn-secondary w-full" onclick="prevQuestion()">← 上一题</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 加载页 -->
+  <div id="loading" class="page">
+    <div class="flex-1 flex items-center justify-center p-6">
+      <div class="text-center fade-in">
+        <div class="text-5xl mb-6 floating">✨</div>
+        <div class="loading-spinner">
+          <div class="loading-circle"></div>
+          <div class="loading-circle"></div>
+          <div class="loading-circle"></div>
+        </div>
+        <p class="text-lg mb-2" style="color: #c9a5b1;">正在构建你的语言沙盘……</p>
+        <p class="text-base" style="color: #d4c4cb;">正在生成内心图景的描述……</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 结果页 -->
+  <div id="result" class="page">
+    <div class="flex-1 flex items-center justify-center p-6 overflow-auto">
+      <div class="max-w-xl w-full fade-in">
+        <div class="text-center mb-6">
+          <div class="text-4xl mb-2">🌷</div>
+          <h1 class="text-2xl font-light gradient-text">你的语言沙盘</h1>
+        </div>
+        <div id="result-content" class="card-shadow bg-white rounded-3xl p-6 md:p-8" style="box-shadow: 0 10px 40px rgba(180, 140, 160, 0.1);"></div>
+        <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
+          <button class="btn btn-secondary flex-1" onclick="restartTest()">重新测试</button>
+          <button class="btn btn-primary flex-1" onclick="copyPrompt()">复制 Prompt</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const questions = [
+  { id: "q1", type: "single", dimension: "environment", question: "此刻的你，更像站在哪种环境里？", questionWeight: 1.2, options: [{ value: "sunny_grassland", label: "阳光下的空旷草地", emotionTags: ["开放", "松弛", "安全感", "希望"], weight: 1, promptTags: ["open grassland", "sunlight", "wide space"] }, { value: "cloudy_city", label: "阴天的城市街道", emotionTags: ["疲惫", "现实压力", "疏离", "克制"], weight: 3, promptTags: ["cloudy city street", "urban silence", "gray tone"] }, { value: "rainy_window", label: "雨中的窗边", emotionTags: ["敏感", "孤独", "低落", "内省"], weight: 4, promptTags: ["rain by the window", "indoor solitude", "wet glass"] }, { value: "foggy_space", label: "浓雾中的空间", emotionTags: ["迷茫", "不确定", "失向感", "困顿"], weight: 5, promptTags: ["dense fog", "unclear space", "lost direction"] }, { value: "night_room", label: "深夜的房间", emotionTags: ["封闭", "压抑", "孤独", "自我包裹"], weight: 5, promptTags: ["dark room at night", "enclosed interior", "low light"] }] },
+  { id: "q2", type: "single", dimension: "light", question: "这个空间里的光，更像哪一种？", questionWeight: 1.1, options: [{ value: "bright_even", label: "明亮均匀", emotionTags: ["清晰", "平稳", "可控", "安全"], weight: 1, promptTags: ["bright even lighting", "clear atmosphere"] }, { value: "soft_dim", label: "柔和但偏暗", emotionTags: ["平静", "低能量", "克制", "轻微压抑"], weight: 2, promptTags: ["soft dim light", "low contrast"] }, { value: "strong_shadow", label: "有强烈阴影", emotionTags: ["紧张", "冲突", "防御感"], weight: 4, promptTags: ["strong shadow", "high contrast", "dramatic light"] }, { value: "tiny_light", label: "只有一点光", emotionTags: ["脆弱", "求助", "残存希望"], weight: 4, promptTags: ["single small light source", "dark environment"] }, { value: "almost_dark", label: "几乎没有光", emotionTags: ["无力", "麻木", "失落", "封闭"], weight: 5, promptTags: ["almost complete darkness", "very low visibility"] }] },
+  { id: "q3", type: "single", dimension: "self_position", question: "你在这个空间中的位置，更接近哪一种？", questionWeight: 1.2, options: [{ value: "center", label: "正中间", emotionTags: ["在场感", "自我明确", "稳定"], weight: 1, promptTags: ["subject centered", "clear presence"] }, { value: "edge", label: "靠边", emotionTags: ["谨慎", "退缩", "边缘感"], weight: 3, promptTags: ["subject near the edge", "asymmetrical framing"] }, { value: "surrounded", label: "被包围", emotionTags: ["压力", "被注视", "窒息感"], weight: 5, promptTags: ["surrounded subject", "compressed space"] }, { value: "corner", label: "在角落", emotionTags: ["逃避", "自我保护", "孤立"], weight: 4, promptTags: ["subject in a corner", "isolated composition"] }, { value: "invisible_self", label: "看不见自己", emotionTags: ["消失感", "麻木", "身份模糊"], weight: 5, promptTags: ["absence of figure", "vanishing self"] }] },
+  { id: "q4", type: "single", dimension: "space_pressure", question: "周围环境更像哪一种？", questionWeight: 1.3, options: [{ value: "open", label: "开阔无遮挡", emotionTags: ["自由", "呼吸感", "松弛"], weight: 1, promptTags: ["wide open space", "breathing room"] }, { value: "partially_blocked", label: "有一些阻挡", emotionTags: ["迟滞", "犹豫", "小阻力"], weight: 2, promptTags: ["partial obstacles", "narrow passages"] }, { value: "crowded", label: "很拥挤", emotionTags: ["压迫", "烦躁", "社交消耗"], weight: 4, promptTags: ["crowded environment", "tight spacing"] }, { value: "enclosed", label: "像在封闭空间", emotionTags: ["受限", "闷压", "无出口感"], weight: 5, promptTags: ["enclosed space", "closed walls"] }, { value: "unstable_changing", label: "不稳定、在变化", emotionTags: ["焦虑", "失控", "不安"], weight: 5, promptTags: ["unstable environment", "shifting surroundings"] }] },
+  { id: "q5", type: "single", dimension: "movement", question: "你在这个画面里，更像处于什么状态？", questionWeight: 1.2, options: [{ value: "standing_still", label: "稳稳站着", emotionTags: ["稳定", "笃定", "自持"], weight: 1, promptTags: ["still figure", "stable stance"] }, { value: "moving_forward", label: "缓慢前进", emotionTags: ["修复中", "坚持", "带希望"], weight: 2, promptTags: ["slow forward movement", "gentle motion"] }, { value: "stopped", label: "停住不动", emotionTags: ["停滞", "犹豫", "低动力"], weight: 3, promptTags: ["motionless figure", "paused state"] }, { value: "pushed", label: "被推着走", emotionTags: ["被动", "失控", "外界裹挟"], weight: 5, promptTags: ["forced movement", "external pressure"] }, { value: "floating", label: "在漂浮", emotionTags: ["游离", "失重", "不落地"], weight: 4, promptTags: ["floating figure", "weightless"] }] },
+  { id: "q6", type: "single", dimension: "space_stability", question: "空间本身给你的感觉是？", questionWeight: 1.2, options: [{ value: "stable", label: "完全稳定", emotionTags: ["安全", "平衡", "可预测"], weight: 1, promptTags: ["stable geometry", "balanced framing"] }, { value: "slightly_shaky", label: "有一点晃动", emotionTags: ["波动", "敏感", "轻微不安"], weight: 2, promptTags: ["slight instability", "subtle shake"] }, { value: "tilted", label: "倾斜", emotionTags: ["失衡", "紧张", "支撑不足"], weight: 4, promptTags: ["tilted composition", "off balance"] }, { value: "rotating", label: "在旋转", emotionTags: ["混乱", "眩晕", "情绪失序"], weight: 5, promptTags: ["rotating environment", "spiral sensation"] }, { value: "constantly_changing", label: "不断变化", emotionTags: ["焦虑", "不可控", "持续消耗"], weight: 5, promptTags: ["constantly shifting environment", "unstable forms"] }] },
+  { id: "q7", type: "single", dimension: "self_form", question: "如果把你现在的状态变成一个存在，它更像什么？", questionWeight: 1.4, options: [{ value: "clear_person", label: "清晰的人", emotionTags: ["完整", "自我清楚", "在场"], weight: 1, promptTags: ["clear human figure", "defined self"] }, { value: "small_self", label: "小小的自己", emotionTags: ["脆弱", "敏感", "需要保护"], weight: 3, promptTags: ["small figure", "fragile presence"] }, { value: "animal", label: "一个动物", emotionTags: ["本能", "防御", "情绪外化"], weight: 3, promptTags: ["animal-like presence", "instinctive form"] }, { value: "shadow", label: "一团影子", emotionTags: ["压抑", "隐藏", "自我模糊"], weight: 5, promptTags: ["shadow figure", "blurred identity"] }, { value: "object", label: "一个物体", emotionTags: ["麻木", "去人格化", "抽离"], weight: 5, promptTags: ["object as self", "emotional numbness"] }] },
+  { id: "q8", type: "single", dimension: "animal_projection", question: "如果它是一种动物，你直觉更接近哪一个？", questionWeight: 1, options: [{ value: "cat", label: "猫", emotionTags: ["敏感", "警觉", "克制依恋"], weight: 3, promptTags: ["cat symbolism", "watchful stillness"] }, { value: "dog", label: "狗", emotionTags: ["依恋", "连接需求", "忠诚"], weight: 2, promptTags: ["dog symbolism", "attachment"] }, { value: "bird", label: "鸟", emotionTags: ["逃离冲动", "自由需求", "不安"], weight: 4, promptTags: ["bird symbolism", "desire to leave"] }, { value: "deer", label: "鹿", emotionTags: ["警惕", "紧绷", "易受惊"], weight: 4, promptTags: ["deer symbolism", "fragile alertness"] }, { value: "crow", label: "乌鸦", emotionTags: ["孤独", "疏离", "冷感", "自守"], weight: 5, promptTags: ["crow symbolism", "solitude", "dark intelligence"] }] },
+  { id: "q9", type: "single", dimension: "air_texture", question: "这个空间的空气里，更像漂浮着什么？", questionWeight: 1.1, options: [{ value: "clear_air", label: "清澈空气", emotionTags: ["通透", "轻松", "松弛"], weight: 1, promptTags: ["clear air", "clean atmosphere"] }, { value: "moist_vapor", label: "水汽", emotionTags: ["柔软", "情绪化", "湿润敏感"], weight: 2, promptTags: ["moist air", "soft vapor"] }, { value: "dust", label: "灰尘", emotionTags: ["疲惫", "陈旧感", "轻微压抑"], weight: 3, promptTags: ["dust in the air", "aged texture"] }, { value: "dense_fog", label: "浓雾", emotionTags: ["迷失", "困住", "看不清方向"], weight: 5, promptTags: ["dense fog", "low visibility"] }, { value: "particles_fragments", label: "颗粒/碎片", emotionTags: ["破碎", "烦乱", "分裂感"], weight: 5, promptTags: ["floating particles", "fragments"] }] },
+  { id: "q10", type: "single", dimension: "emotion_material", question: "如果你的情绪是一种材质，它更像？", questionWeight: 1.4, options: [{ value: "water", label: "水", emotionTags: ["流动", "感受力强", "可疏导"], weight: 2, promptTags: ["water texture", "flowing emotion"] }, { value: "stone", label: "石头", emotionTags: ["沉重", "压抑", "负担感"], weight: 5, promptTags: ["stone texture", "heaviness"] }, { value: "sand", label: "沙子", emotionTags: ["分散", "抓不住", "疲乏"], weight: 4, promptTags: ["sand texture", "scattered feeling"] }, { value: "metal", label: "金属", emotionTags: ["防御", "冷硬", "疏离"], weight: 4, promptTags: ["metal texture", "cold reflective surface"] }, { value: "glass", label: "玻璃", emotionTags: ["脆弱", "易碎", "紧绷"], weight: 4, promptTags: ["glass texture", "fragility"] }] },
+  { id: "q11", type: "single", dimension: "others_presence", question: "在这个画面里，还有别的人或存在吗？", questionWeight: 1.1, options: [{ value: "alone", label: "没有", emotionTags: ["独处", "隔离", "自守"], weight: 3, promptTags: ["alone in the scene", "isolation"] }, { value: "far_away_people", label: "有，但很远", emotionTags: ["疏离", "轻度孤独", "难靠近"], weight: 3, promptTags: ["distant people", "faraway silhouettes"] }, { value: "nearby_people", label: "在附近", emotionTags: ["连接感", "关系在场", "被观察"], weight: 2, promptTags: ["people nearby", "soft social presence"] }, { value: "very_close_people", label: "很靠近", emotionTags: ["边界被触碰", "压迫或依赖"], weight: 4, promptTags: ["very close figures", "compressed relational space"] }, { value: "unclear_presence", label: "看不清", emotionTags: ["模糊关系", "不确定", "安全感不足"], weight: 4, promptTags: ["unclear figures", "ambiguous others"] }] },
+  { id: "q12", type: "single", dimension: "relationship_feeling", question: "这些存在带给你的感觉，更像哪一种？", questionWeight: 1.3, options: [{ value: "safe", label: "安全", emotionTags: ["被支持", "信任", "安定"], weight: 1, promptTags: ["protective presence", "safe relational tone"] }, { value: "neutral", label: "无感", emotionTags: ["钝感", "疏离", "低参与"], weight: 3, promptTags: ["emotionally neutral presence", "detached relation"] }, { value: "pressure", label: "压力", emotionTags: ["被期待", "被评价", "负担"], weight: 4, promptTags: ["pressuring presence", "watching eyes"] }, { value: "threat", label: "威胁", emotionTags: ["恐惧", "防御", "戒备"], weight: 5, promptTags: ["threatening presence", "menacing shadows"] }, { value: "invisible_but_there", label: "看不见但存在", emotionTags: ["隐性压力", "悬着", "潜在不安"], weight: 4, promptTags: ["invisible but present force", "unseen observer"] }] },
+  { id: "q13", type: "single", dimension: "inner_need", question: "如果此刻只能满足你一个需求，它更像是？", questionWeight: 1.5, options: [{ value: "rest", label: "休息", emotionTags: ["疲惫", "修复需求", "回撤"], weight: 3, promptTags: ["resting energy", "pause"] }, { value: "understood", label: "被理解", emotionTags: ["委屈", "表达欲", "连接需求"], weight: 3, promptTags: ["being understood", "gentle witness"] }, { value: "escape", label: "逃离", emotionTags: ["压力过载", "排斥现状", "抽离冲动"], weight: 5, promptTags: ["escape route", "urge to leave"] }, { value: "change", label: "改变", emotionTags: ["主动性", "挣脱", "重建愿望"], weight: 2, promptTags: ["transformation", "new direction"] }, { value: "nothing", label: "什么都不想", emotionTags: ["麻木", "冻结", "能量极低"], weight: 5, promptTags: ["emptiness", "shutdown"] }] },
+  { id: "q14", type: "single", dimension: "hope_exit", question: "如果这个画面里有一个出口，它更像是什么？", questionWeight: 1.5, options: [{ value: "light_exit", label: "一束光", emotionTags: ["希望", "指引", "修复"], weight: 1, promptTags: ["beam of light", "guiding light"] }, { value: "door", label: "一扇门", emotionTags: ["转机", "边界", "选择可能"], weight: 2, promptTags: ["a door", "threshold"] }, { value: "road", label: "一条路", emotionTags: ["过程感", "恢复中", "行动可能"], weight: 2, promptTags: ["a road ahead", "pathway"] }, { value: "figure", label: "一个身影", emotionTags: ["陪伴需求", "依附", "被拯救感"], weight: 3, promptTags: ["distant figure", "companion silhouette"] }, { value: "no_exit", label: "没有出口", emotionTags: ["绝望", "困住", "无助"], weight: 5, promptTags: ["no visible exit", "sealed space"] }] },
+  { id: "q15", type: "single", dimension: "visual_style", question: "这个画面整体更接近哪种风格？", questionWeight: 0.9, options: [{ value: "real_world", label: "真实世界", emotionTags: ["理性", "贴地", "现实处理"], weight: 2, promptTags: ["realistic scene", "natural detail"] }, { value: "cinematic", label: "电影场景", emotionTags: ["表达欲", "戏剧感", "自我观看"], weight: 2, promptTags: ["cinematic scene", "dramatic framing"] }, { value: "dream", label: "梦境", emotionTags: ["潜意识活跃", "漂浮", "模糊边界"], weight: 4, promptTags: ["dreamlike atmosphere", "surreal softness"] }, { value: "abstract_painting", label: "抽象画", emotionTags: ["复杂", "难以言说", "碎片化"], weight: 4, promptTags: ["abstract visual language", "symbolic shapes"] }, { value: "uncertain_style", label: "说不清", emotionTags: ["混乱", "模糊", "未成形"], weight: 5, promptTags: ["ambiguous style", "undefined atmosphere"] }] },
+  { id: "q16", type: "single", dimension: "energy", question: "你现在的能量状态，更接近哪一种？", questionWeight: 1.4, options: [{ value: "stable_energy", label: "很稳定", emotionTags: ["平衡", "平静", "可持续"], weight: 1, promptTags: ["stable energy", "balanced visual rhythm"] }, { value: "slightly_wavy", label: "有点波动", emotionTags: ["敏感", "轻微起伏"], weight: 2, promptTags: ["slight fluctuation", "gentle wave-like feeling"] }, { value: "intense_fluctuation", label: "起伏很大", emotionTags: ["情绪不稳", "波动强烈"], weight: 4, promptTags: ["strong fluctuations", "unstable emotional rhythm"] }, { value: "almost_exhausted", label: "快耗尽", emotionTags: ["疲惫", "低电量", "无力"], weight: 5, promptTags: ["drained energy", "exhausted atmosphere"] }, { value: "about_to_burst", label: "快爆发", emotionTags: ["积压", "愤怒", "即将失控"], weight: 5, promptTags: ["pent-up intensity", "about to burst"] }] },
+  { id: "q17", type: "single", dimension: "color_intuition", question: "你第一直觉会选哪一种颜色？", questionWeight: 0.8, options: [{ value: "blue", label: "蓝", emotionTags: ["冷静", "忧郁", "理性克制"], weight: 3, promptTags: ["blue tone", "cool atmosphere"] }, { value: "gray", label: "灰", emotionTags: ["疲惫", "模糊", "低能量"], weight: 4, promptTags: ["gray palette", "muted tones"] }, { value: "black", label: "黑", emotionTags: ["压抑", "防御", "封闭"], weight: 5, promptTags: ["black dominant palette", "deep shadow"] }, { value: "red", label: "红", emotionTags: ["强烈", "愤怒", "生命力", "冲突"], weight: 4, promptTags: ["red accents", "heated emotion"] }, { value: "yellow", label: "黄", emotionTags: ["希望", "轻盈", "恢复意愿"], weight: 1, promptTags: ["yellow light", "warm brightness"] }] },
+  { id: "q18", type: "single", dimension: "core_symbol", question: "如果这个画面里只能保留一个核心元素，你会选？", questionWeight: 1.1, options: [{ value: "light", label: "光", emotionTags: ["希望", "指引", "修复"], weight: 1, promptTags: ["light as core symbol", "luminous center"] }, { value: "water_element", label: "水", emotionTags: ["流动", "疗愈", "柔软"], weight: 2, promptTags: ["water as central symbol", "reflective surface"] }, { value: "wind", label: "风", emotionTags: ["变化", "松动", "逃离"], weight: 3, promptTags: ["wind as symbol", "moving air"] }, { value: "architecture", label: "建筑", emotionTags: ["秩序", "边界感", "防御"], weight: 3, promptTags: ["architectural form", "structured space"] }, { value: "blank", label: "空白", emotionTags: ["抽离", "重置", "空心感"], weight: 4, promptTags: ["negative space", "blankness"] }] },
+  { id: "q19", type: "text", dimension: "free_imagery", question: "如果你可以往这个画面里放进一个场景、物件、天气或细节，你最想放进去什么？", questionWeight: 1.6, placeholder: "例如：一盏旧台灯、海边的风、一条长长的走廊……", promptUse: "将用户原文作为高优先级意象，直接并入 imagePrompt。" },
+  { id: "q20", type: "text", dimension: "unsaid_sentence", question: "如果这个画面里藏着一句你没有说出口的话，那会是什么？", questionWeight: 1.6, placeholder: "例如：我其实很累了 / 我希望有人看见我……", promptUse: "不要直接把原句作为画面文字显示，而是将它转译成氛围描述。" }
+];
+
+let currentQuestion = 0;
+let answers = questions.map(q => ({ questionId: q.id, value: '', label: '', type: q.type }));
+let textInputs = {};
+let currentResultData = null;
+
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  if (pageId === 'test') renderQuestion();
+  else if (pageId === 'loading') {
+    setTimeout(() => { showPage('result'); updateResult(); }, 2500);
+  }
+}
+
+function renderQuestion() {
+  const q = questions[currentQuestion];
+  const container = document.getElementById('question-container');
+  
+  document.getElementById('progress-text').textContent = `${currentQuestion + 1}/${questions.length}`;
+  document.getElementById('progress-fill').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+  document.getElementById('prev-btn').disabled = currentQuestion === 0;
+  
+  if (q.type === 'text') {
+    container.innerHTML = `
+      <h2 class="text-xl md:text-2xl font-light mb-6 text-center leading-relaxed" style="color: #5a4a4f;">${q.question}</h2>
+      <div class="space-y-4">
+        <textarea id="text-input" class="w-full p-4 border-2 rounded-2xl text-base leading-relaxed resize-none focus:outline-none transition-all" style="border-color: #f5e6ea; color: #5a4a4f;" rows="4" placeholder="${q.placeholder}" onfocus="this.style.borderColor='#ffb5c5'" onblur="this.style.borderColor='#f5e6ea'">${textInputs[q.id] || ''}</textarea>
+        <button onclick="submitTextAnswer()" class="w-full py-3 px-4 text-white rounded-2xl font-medium transition-all" style="background: linear-gradient(135deg, #ffb5c5 0%, #ff8fb3 100%); box-shadow: 0 4px 15px rgba(255,155,181,0.3);" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(255,155,181,0.4)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 15px rgba(255,155,181,0.3)'">${currentQuestion === questions.length - 1 ? '查看结果' : '下一题'} →</button>
+      </div>`;
+  } else {
+    const currentAnswer = answers.find(a => a.questionId === q.id);
+    container.innerHTML = `
+      <h2 class="text-xl md:text-2xl font-light mb-6 text-center leading-relaxed" style="color: #5a4a4f;">${q.question}</h2>
+      <div class="space-y-3">
+        ${q.options.map(opt => `
+          <div class="option-item ${currentAnswer?.value === opt.value ? 'selected' : ''}" onclick="selectOption('${opt.value}', '${opt.label.replace(/'/g, "\\'")}')">
+            <div class="option-radio"><div class="option-radio-inner"></div></div>
+            <span class="text-base leading-snug" style="color: ${currentAnswer?.value === opt.value ? '#c47d8e' : '#6a5a5f'}">${opt.label}</span>
+          </div>
+        `).join('')}
+      </div>`;
+  }
+}
+
+function selectOption(value, label) {
+  answers[currentQuestion] = { questionId: questions[currentQuestion].id, value, label, type: 'single' };
+  if (currentQuestion < questions.length - 1) {
+    setTimeout(() => { currentQuestion++; renderQuestion(); }, 300);
+  } else {
+    completeTest();
+  }
+}
+
+function submitTextAnswer() {
+  const input = document.getElementById('text-input');
+  const value = input.value;
+  textInputs[questions[currentQuestion].id] = value;
+  answers[currentQuestion] = { questionId: questions[currentQuestion].id, value, label: value, type: 'text' };
+  if (currentQuestion < questions.length - 1) {
+    currentQuestion++;
+    renderQuestion();
+  } else {
+    completeTest();
+  }
+}
+
+function prevQuestion() {
+  if (currentQuestion > 0) { currentQuestion--; renderQuestion(); }
+}
+
+function completeTest() {
+  localStorage.setItem('lsAnswers', JSON.stringify(answers));
+  showPage('loading');
+}
+
+function buildResult() {
+  const result = { answers: {}, emotionTags: [], totalScore: 0, promptTags: [] };
+  answers.forEach(a => { result.answers[a.questionId] = a.value; });
+  
+  let totalScore = 0;
+  const tagCounts = {};
+  const allPromptTags = [];
+  
+  answers.forEach(a => {
+    if (a.type === 'single') {
+      const q = questions.find(q => q.id === a.questionId);
+      const opt = q?.options?.find(o => o.value === a.value);
+      if (opt) {
+        totalScore += opt.weight * (q?.questionWeight || 1);
+        opt.emotionTags?.forEach(t => { tagCounts[t] = (tagCounts[t] || 0) + 1; });
+        allPromptTags.push(...(opt.promptTags || []));
+      }
+    }
+  });
+  
+  result.totalScore = Math.round(totalScore * 10) / 10;
+  result.emotionTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).map(e => e[0]);
+  result.promptTags = [...new Set(allPromptTags)];
+  
+  const q19 = answers.find(a => a.questionId === 'q19')?.value || '';
+  const q20 = answers.find(a => a.questionId === 'q20')?.value || '';
+  
+  result.imagePrompt = buildImagePrompt(result.answers, q19, q20);
+  
+  let status = '相对稳定 / 可恢复';
+  if (result.totalScore > 75) status = '高压 / 封闭 / 困住感明显';
+  else if (result.totalScore > 55) status = '明显压迫 / 失衡 / 需要出口';
+  else if (result.totalScore > 35) status = '轻到中度压力 / 内耗中';
+  result.status = status;
+  
+  return result;
+}
+
+function buildImagePrompt(ans, q19, q20) {
+  const envMap = { sunny_grassland: '阳光下的空旷草地', cloudy_city: '阴天的城市街道', rainy_window: '雨中的窗边', foggy_space: '浓雾中的空间', night_room: '深夜的房间' };
+  const lightMap = { bright_even: '明亮均匀', soft_dim: '柔和但偏暗', strong_shadow: '有强烈阴影', tiny_light: '只有一点光', almost_dark: '几乎全暗' };
+  const styleMap = { real_world: '写实风格', cinematic: '电影感', dream: '梦境般的超现实', abstract_painting: '抽象画风格', uncertain_style: '模糊未定义' };
+  const colorMap = { blue: '蓝色调', gray: '灰色调', black: '黑色调', red: '红色调', yellow: '黄色调' };
+  
+  const env = envMap[ans.q1] || '';
+  const light = lightMap[ans.q2] || '';
+  const style = styleMap[ans.q15] || '电影感的视觉风格';
+  const color = colorMap[ans.q17] || '';
+  
+  let prompt = `一个具有电影感和心理隐喻的画面，场景是${env}，整体光线${light}。整体风格${style}，色彩倾向于${color}。`;
+  
+  if (q19) prompt += ` 补充意象包括：${q19}。`;
+  if (q20) prompt += ` 这幅画传达出未说出口的情绪："${q20}"。`;
+  
+  return prompt;
+}
+
+function updateResult() {
+  currentResultData = buildResult();
+  const tags = currentResultData.emotionTags.slice(0, 5);
+  
+  document.getElementById('result-content').innerHTML = `
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+      <div class="text-center">
+        <div class="text-4xl font-bold" style="color: #c47d8e;">${currentResultData.totalScore}</div>
+        <div class="text-sm" style="color: #b8a5b0;">总分</div>
+      </div>
+      <div class="hidden sm:block w-px h-12" style="background: #f5e6ea;"></div>
+      <div class="px-4 py-2 rounded-full text-sm font-medium" style="background: linear-gradient(135deg, rgba(255,181,197,0.15) 0%, rgba(255,143,179,0.1) 100%); color: #c47d8e;">${currentResultData.status}</div>
+    </div>
+    <div class="mb-5">
+      <h3 class="text-sm font-medium mb-3 text-center" style="color: #b8a5b0;">主要情绪标签</h3>
+      <div class="flex flex-wrap justify-center gap-2">
+        ${tags.map(t => `<span class="px-3 py-1.5 rounded-full text-sm" style="background: linear-gradient(135deg, rgba(255,181,197,0.2) 0%, rgba(255,143,179,0.15) 100%); color: #c47d8e;">${t}</span>`).join('')}
+      </div>
+    </div>
+    <div class="mb-5">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-sm font-medium" style="color: #b8a5b0;">生成图像的 Prompt</h3>
+      </div>
+      <div class="rounded-2xl p-4 text-sm leading-relaxed whitespace-pre-wrap" style="background: #fdf8f6; border: 1px solid #f5e6ea; color: #6a5a5f;">${currentResultData.imagePrompt}</div>
+    </div>`;
+}
+
+function restartTest() {
+  currentQuestion = 0;
+  answers = questions.map(q => ({ questionId: q.id, value: '', label: '', type: q.type }));
+  textInputs = {};
+  currentResultData = null;
+  showPage('home');
+}
+
+function copyPrompt() {
+  if (currentResultData?.imagePrompt) {
+    navigator.clipboard.writeText(currentResultData.imagePrompt).then(() => alert('已复制到剪贴板 ✨'));
+  }
+}
+</script>
+</body>
+</html>
