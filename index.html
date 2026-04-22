@@ -410,7 +410,7 @@
   <!-- 首页 -->
   <div id="home" class="page active home-page">
     <div class="home-content fade-in">
-      <h1>12个问题，生成你的内心图景</h1>
+      <h1>18个问题，生成你的内心图景</h1>
       <p>把说不清的情绪，变成一张图</p>
       <button class="btn btn-primary" onclick="showPage('test')">
         开始测试 →
@@ -422,11 +422,11 @@
   <div id="test" class="page test-page">
     <div class="progress-container">
       <div class="progress-header">
-        <span id="progress-text">1/12</span>
+        <span id="progress-text">1/18</span>
         <span>情绪测试</span>
       </div>
       <div class="progress-bar">
-        <div id="progress-fill" class="progress-fill" style="width: 8.33%;"></div>
+        <div id="progress-fill" class="progress-fill" style="width: 5.56%;"></div>
       </div>
     </div>
 
@@ -513,125 +513,476 @@
     const questions = [
       {
         id: 1,
-        question: '当你感到压力时，你会选择哪种方式放松？',
+        key: 'environment',
+        title: '你更像站在哪种环境里？',
+        type: 'single',
         options: [
-          '听音乐',
-          '散步',
-          '冥想',
-          '与朋友聊天'
+          { value: 'sunny_grassland', label: '阳光下的空旷草地' },
+          { value: 'cloudy_city', label: '阴天的城市街道' },
+          { value: 'rainy_window', label: '雨中的窗边' },
+          { value: 'foggy_space', label: '浓雾中的空间' },
+          { value: 'night_room', label: '深夜的房间' }
         ]
       },
       {
         id: 2,
-        question: '你最喜欢的天气是？',
+        key: 'light',
+        title: '这个空间的光更像？',
+        type: 'single',
         options: [
-          '晴天',
-          '雨天',
-          '多云',
-          '雪天'
+          { value: 'bright_even', label: '明亮均匀' },
+          { value: 'soft_dim', label: '柔和但偏暗' },
+          { value: 'strong_shadow', label: '有强烈阴影' },
+          { value: 'tiny_light', label: '只有一点光' },
+          { value: 'almost_dark', label: '几乎没有光' }
         ]
       },
       {
         id: 3,
-        question: '你理想的周末是怎样的？',
+        key: 'position',
+        title: '你在这个空间中的位置是？',
+        type: 'single',
         options: [
-          '宅在家休息',
-          '户外活动',
-          '与朋友聚会',
-          '学习或工作'
+          { value: 'center', label: '正中间' },
+          { value: 'edge', label: '靠边' },
+          { value: 'surrounded', label: '被包围' },
+          { value: 'corner', label: '在角落' },
+          { value: 'invisible_self', label: '看不见自己' }
         ]
       },
       {
         id: 4,
-        question: '当你感到悲伤时，你会？',
+        key: 'space_structure',
+        title: '周围环境更像？',
+        type: 'single',
         options: [
-          '独处',
-          '寻求安慰',
-          '做些事情分散注意力',
-          '反思原因'
+          { value: 'open', label: '开阔无遮挡' },
+          { value: 'partially_blocked', label: '有一些阻挡' },
+          { value: 'crowded', label: '很拥挤' },
+          { value: 'enclosed', label: '像在封闭空间' },
+          { value: 'unstable_changing', label: '不稳定、在变化' }
         ]
       },
       {
         id: 5,
-        question: '你最喜欢的颜色是？',
+        key: 'movement',
+        title: '你在这个画面里是？',
+        type: 'single',
         options: [
-          '温暖的色调（红、橙、黄）',
-          '冷静的色调（蓝、绿）',
-          '中性色调（黑、白、灰）',
-          '鲜艳的色调（紫、粉）'
+          { value: 'standing_still', label: '稳稳站着' },
+          { value: 'moving_forward', label: '缓慢前进' },
+          { value: 'stopped', label: '停住不动' },
+          { value: 'pushed', label: '被推着走' },
+          { value: 'floating', label: '在漂浮' }
         ]
       },
       {
         id: 6,
-        question: '你认为自己是一个？',
+        key: 'space_motion',
+        title: '空间本身是？',
+        type: 'single',
         options: [
-          '外向的人',
-          '内向的人',
-          '介于两者之间',
-          '根据情况变化'
+          { value: 'stable', label: '完全稳定' },
+          { value: 'slightly_shaky', label: '有一点晃动' },
+          { value: 'tilted', label: '倾斜' },
+          { value: 'rotating', label: '在旋转' },
+          { value: 'constantly_changing', label: '不断变化' }
         ]
       },
       {
         id: 7,
-        question: '你喜欢的音乐类型是？',
+        key: 'self_form',
+        title: '你更像哪种存在？',
+        type: 'single',
         options: [
-          '流行音乐',
-          '古典音乐',
-          '摇滚音乐',
-          '电子音乐'
+          { value: 'clear_person', label: '清晰的人' },
+          { value: 'small_self', label: '小小的自己' },
+          { value: 'animal', label: '一个动物' },
+          { value: 'shadow', label: '一团影子' },
+          { value: 'object', label: '一个物体' }
         ]
       },
       {
         id: 8,
-        question: '你最看重的品质是？',
+        key: 'animal_type',
+        title: '如果是动物，更接近？',
+        type: 'single',
         options: [
-          '诚实',
-          '善良',
-          '智慧',
-          '勇气'
+          { value: 'cat', label: '猫（敏感）' },
+          { value: 'dog', label: '狗（依赖）' },
+          { value: 'bird', label: '鸟（想逃离）' },
+          { value: 'deer', label: '鹿（警惕）' },
+          { value: 'crow', label: '乌鸦（孤独）' }
         ]
       },
       {
         id: 9,
-        question: '你面对挑战时的态度是？',
+        key: 'air_texture',
+        title: '空气里更像充满？',
+        type: 'single',
         options: [
-          '勇敢面对',
-          '谨慎思考',
-          '寻求帮助',
-          '回避'
+          { value: 'clear_air', label: '清澈空气' },
+          { value: 'moist_vapor', label: '水汽' },
+          { value: 'dust', label: '灰尘' },
+          { value: 'dense_fog', label: '浓雾' },
+          { value: 'particles_fragments', label: '颗粒 / 碎片' }
         ]
       },
       {
         id: 10,
-        question: '你喜欢的季节是？',
+        key: 'emotion_material',
+        title: '情绪更像哪种材质？',
+        type: 'single',
         options: [
-          '春天',
-          '夏天',
-          '秋天',
-          '冬天'
+          { value: 'water', label: '水（流动）' },
+          { value: 'stone', label: '石头（压着）' },
+          { value: 'sand', label: '沙子（散）' },
+          { value: 'metal', label: '金属（冷）' },
+          { value: 'glass', label: '玻璃（脆）' }
         ]
       },
       {
         id: 11,
-        question: '你理想的居住环境是？',
+        key: 'others_presence',
+        title: '画面里还有别人吗？',
+        type: 'single',
         options: [
-          '城市',
-          '郊区',
-          '乡村',
-          '海边'
+          { value: 'alone', label: '没有' },
+          { value: 'far_away_people', label: '有，但很远' },
+          { value: 'nearby_people', label: '在附近' },
+          { value: 'very_close_people', label: '很靠近' },
+          { value: 'unclear_presence', label: '看不清' }
         ]
       },
       {
         id: 12,
-        question: '当你完成一件重要的事情时，你会？',
+        key: 'others_feeling',
+        title: '他们给你的感觉是？',
+        type: 'single',
         options: [
-          '庆祝',
-          '反思',
-          '休息',
-          '开始下一件事'
+          { value: 'safe', label: '安全' },
+          { value: 'neutral', label: '无感' },
+          { value: 'pressure', label: '压力' },
+          { value: 'threat', label: '威胁' },
+          { value: 'invisible_but_there', label: '看不见但存在' }
+        ]
+      },
+      {
+        id: 13,
+        key: 'inner_need',
+        title: '你更想？',
+        type: 'single',
+        options: [
+          { value: 'rest', label: '休息' },
+          { value: 'understood', label: '被理解' },
+          { value: 'escape', label: '逃离' },
+          { value: 'change', label: '改变' },
+          { value: 'nothing', label: '什么都不想' }
+        ]
+      },
+      {
+        id: 14,
+        key: 'exit_type',
+        title: '画面中有没有"出口"？',
+        type: 'single',
+        options: [
+          { value: 'light_exit', label: '明亮的光' },
+          { value: 'door', label: '一扇门' },
+          { value: 'road', label: '一条路' },
+          { value: 'figure', label: '一个身影' },
+          { value: 'no_exit', label: '没有出口' }
+        ]
+      },
+      {
+        id: 15,
+        key: 'visual_style',
+        title: '整个画面更像？',
+        type: 'single',
+        options: [
+          { value: 'real_world', label: '真实世界' },
+          { value: 'cinematic', label: '电影场景' },
+          { value: 'dream', label: '梦境' },
+          { value: 'abstract_painting', label: '抽象画' },
+          { value: 'uncertain_style', label: '不确定' }
+        ]
+      },
+      {
+        id: 16,
+        key: 'energy_state',
+        title: '你的能量更像？',
+        type: 'single',
+        options: [
+          { value: 'stable_energy', label: '很稳定' },
+          { value: 'slightly_wavy', label: '有点波动' },
+          { value: 'intense_fluctuation', label: '起伏很大' },
+          { value: 'almost_exhausted', label: '快耗尽' },
+          { value: 'about_to_burst', label: '快爆发' }
+        ]
+      },
+      {
+        id: 17,
+        key: 'main_color',
+        title: '你直觉选一个颜色',
+        type: 'single',
+        options: [
+          { value: 'blue', label: '蓝' },
+          { value: 'gray', label: '灰' },
+          { value: 'black', label: '黑' },
+          { value: 'red', label: '红' },
+          { value: 'yellow', label: '黄' }
+        ]
+      },
+      {
+        id: 18,
+        key: 'core_symbol',
+        title: '如果画面里只能留一个元素，你选？',
+        type: 'single',
+        options: [
+          { value: 'light', label: '光' },
+          { value: 'water_element', label: '水' },
+          { value: 'wind', label: '风' },
+          { value: 'architecture', label: '建筑' },
+          { value: 'blank', label: '空白' }
         ]
       }
     ];
+
+    // 答案映射到图像生成关键词
+    const answerMap = {
+      // 环境
+      environment: {
+        sunny_grassland: ['bright', 'open field', 'sunshine', 'vibrant'],
+        cloudy_city: ['urban', 'overcast', 'moody', 'gray tones'],
+        rainy_window: ['rain', 'cozy', 'intimate', 'reflection'],
+        foggy_space: ['mysterious', 'ethereal', 'obscured', 'dreamlike'],
+        night_room: ['dark', 'quiet', 'alone', 'contemplative']
+      },
+      // 光线
+      light: {
+        bright_even: ['bright', 'balanced', 'clear'],
+        soft_dim: ['soft', 'gentle', 'muted', 'low key'],
+        strong_shadow: ['dramatic', 'contrasty', 'chiaroscuro'],
+        tiny_light: ['tiny light source', 'lonely', 'spotlight'],
+        almost_dark: ['dark', 'deep shadows', 'mysterious']
+      },
+      // 位置
+      position: {
+        center: ['central figure', 'focus', 'isolated'],
+        edge: ['peripheral', ' outsider', 'observing'],
+        surrounded: ['surrounded', 'crowded', 'enclosed'],
+        corner: ['cornered', 'trapped', 'vulnerable'],
+        invisible_self: ['abstract', 'faceless', 'universal']
+      },
+      // 空间结构
+      space_structure: {
+        open: ['open space', 'free', 'unbounded'],
+        partially_blocked: ['partial barriers', 'obstacles', 'navigating'],
+        crowded: ['dense', 'claustrophobic', 'overwhelming'],
+        enclosed: ['closed in', 'walls', 'restricted'],
+        unstable_changing: ['unstable', 'shifting', 'transforming']
+      },
+      // 移动状态
+      movement: {
+        standing_still: ['still', 'stable', 'grounded'],
+        moving_forward: ['moving', 'progress', 'journey'],
+        stopped: ['frozen', 'stuck', 'halted'],
+        pushed: ['forced movement', 'resistance', 'struggling'],
+        floating: ['floating', 'weightless', 'detached']
+      },
+      // 空间运动
+      space_motion: {
+        stable: ['stable', 'still', 'calm'],
+        slightly_shaky: ['slightly unstable', 'trembling', 'uncertain'],
+        tilted: ['tilted', 'off-balance', 'disoriented'],
+        rotating: ['rotating', 'spinning', 'dizzying'],
+        constantly_changing: ['transforming', 'fluctuating', 'chaotic']
+      },
+      // 自我形态
+      self_form: {
+        clear_person: ['human figure', 'clear', 'defined'],
+        small_self: ['tiny figure', 'small', 'diminutive'],
+        animal: ['animal presence', ['soul', 'spirit', 'inner self']],
+        shadow: ['shadow', 'dark silhouette', 'mysterious'],
+        object: ['object as self', ['metaphorical', 'symbolic']]
+      },
+      // 动物类型
+      animal_type: {
+        cat: ['cat', 'sensitive', 'independent'],
+        dog: ['dog', 'loyal', 'dependent'],
+        bird: ['bird', 'wanting to escape', 'free spirit'],
+        deer: ['deer', 'alert', 'watchful'],
+        crow: ['crow', 'solitary', 'melancholic']
+      },
+      // 空气质感
+      air_texture: {
+        clear_air: ['clear', 'clean', 'fresh'],
+        moist_vapor: ['humid', 'steam', 'misty'],
+        dust: ['dusty', 'particles', 'aged'],
+        dense_fog: ['foggy', 'dense', 'obscured'],
+        particles_fragments: ['particles', 'fragments', 'scattered']
+      },
+      // 情绪材质
+      emotion_material: {
+        water: ['flowing', 'fluid', 'adaptive'],
+        stone: ['heavy', 'compressed', 'burdensome'],
+        sand: ['scattered', 'dispersing', 'slipping away'],
+        metal: ['cold', 'hard', 'rigid'],
+        glass: ['fragile', 'transparent', 'brittle']
+      },
+      // 他人存在
+      others_presence: {
+        alone: ['alone', 'solitary', 'solo'],
+        far_away_people: ['distant figures', 'far away', 'disconnected'],
+        nearby_people: ['nearby presence', 'close', 'accompanied'],
+        very_close_people: ['intimate space', 'crowded', 'overwhelming'],
+        unclear_presence: ['unclear figures', 'ambiguous', 'uncertain']
+      },
+      // 他人感觉
+      others_feeling: {
+        safe: ['safe', 'secure', 'protected'],
+        neutral: ['neutral', 'indifferent', 'apathetic'],
+        pressure: ['pressured', 'tense', 'suffocating'],
+        threat: ['threatening', 'dangerous', 'intimidating'],
+        invisible_but_there: ['hidden presence', 'unseen', 'watching']
+      },
+      // 内心需求
+      inner_need: {
+        rest: ['rest', 'peace', 'relaxation'],
+        understood: ['understanding', 'empathy', 'connection'],
+        escape: ['escape', 'running away', 'freedom'],
+        change: ['transformation', 'change', 'new beginning'],
+        nothing: ['emptiness', 'numbness', 'void']
+      },
+      // 出口类型
+      exit_type: {
+        light_exit: ['bright light', 'hope', 'way out'],
+        door: ['door', 'opportunity', 'transition'],
+        road: ['path', 'journey', 'direction'],
+        figure: ['silhouette', 'guide', 'mysterious figure'],
+        no_exit: ['no exit', 'trapped', 'loop']
+      },
+      // 视觉风格
+      visual_style: {
+        real_world: ['realistic', 'photorealistic', 'natural'],
+        cinematic: ['cinematic', 'movie scene', 'dramatic lighting'],
+        dream: ['dreamlike', 'surreal', 'unreal'],
+        abstract_painting: ['abstract', 'artistic', 'non-representational'],
+        uncertain_style: ['unclear', 'evolving', 'ambiguous style']
+      },
+      // 能量状态
+      energy_state: {
+        stable_energy: ['stable', 'balanced energy', 'calm power'],
+        slightly_wavy: ['slight fluctuations', 'gentle waves', 'undulating'],
+        intense_fluctuation: ['high energy', 'intense', 'dramatic swings'],
+        almost_exhausted: ['drained', 'exhausted', 'low energy'],
+        about_to_burst: ['buildup', 'explosive', 'critical mass']
+      },
+      // 主色调
+      main_color: {
+        blue: ['blue tones', 'melancholic', 'calm yet sad'],
+        gray: ['gray palette', 'neutral', 'indifferent'],
+        black: ['dark', 'dramatic', 'intense'],
+        red: ['red accents', 'passionate', 'energetic'],
+        yellow: ['yellow tones', 'warm', 'hopeful']
+      },
+      // 核心符号
+      core_symbol: {
+        light: ['light', 'hope', 'illumination'],
+        water_element: ['water', 'flow', 'emotions'],
+        wind: ['wind', 'movement', 'freedom'],
+        architecture: ['architecture', 'structure', 'stability'],
+        blank: ['empty space', 'blank', 'void']
+      }
+    };
+
+    // 提示词构建器
+    const promptBuilder = {
+      // 基础风格词
+      baseStyle: ['soft pastel colors', 'emotional landscape', 'gentle curves', 'flowing shapes', 'artistic', 'dreamy'],
+
+      // 情感词映射
+      emotionWords: {
+        positive: ['serene', 'peaceful', 'hopeful', 'gentle', 'warm'],
+        negative: ['melancholic', 'anxious', 'trapped', 'heavy', 'dark'],
+        neutral: ['contemplative', 'reflective', 'balanced', 'mid-tone']
+      },
+
+      // 构建完整提示词
+      buildPrompt(userAnswers) {
+        const keywords = new Set();
+
+        // 添加基础风格
+        this.baseStyle.forEach(word => keywords.add(word));
+
+        // 根据用户答案添加关键词
+        userAnswers.forEach((answerIndex, questionIndex) => {
+          if (answerIndex >= 0 && questions[questionIndex]) {
+            const question = questions[questionIndex];
+            const selectedOption = question.options[answerIndex];
+
+            if (selectedOption && selectedOption.value) {
+              const optionKeywords = this.getKeywordsForOption(question.key, selectedOption.value);
+              optionKeywords.forEach(keyword => keywords.add(keyword));
+            }
+          }
+        });
+
+        // 转换为数组并返回
+        return Array.from(keywords).join(', ');
+      },
+
+      // 获取选项对应的关键词
+      getKeywordsForOption(questionKey, optionValue) {
+        if (answerMap[questionKey] && answerMap[questionKey][optionValue]) {
+          return answerMap[questionKey][optionValue];
+        }
+        return [];
+      },
+
+      // 获取情感倾向
+      getEmotionalTone(userAnswers) {
+        let positiveCount = 0;
+        let negativeCount = 0;
+
+        userAnswers.forEach((answerIndex, questionIndex) => {
+          if (answerIndex >= 0 && questions[questionIndex]) {
+            const question = questions[questionIndex];
+            const selectedOption = question.options[answerIndex];
+
+            // 简单判断情感倾向
+            if (selectedOption && selectedOption.value) {
+              const keywords = this.getKeywordsForOption(question.key, selectedOption.value);
+              if (question.key === 'main_color') {
+                if (['blue', 'gray', 'black'].includes(selectedOption.value)) {
+                  negativeCount++;
+                } else {
+                  positiveCount++;
+                }
+              } else if (question.key === 'energy_state') {
+                if (['almost_exhausted', 'about_to_burst'].includes(selectedOption.value)) {
+                  negativeCount++;
+                } else {
+                  positiveCount++;
+                }
+              } else if (question.key === 'others_feeling') {
+                if (['safe', 'neutral'].includes(selectedOption.value)) {
+                  positiveCount++;
+                } else {
+                  negativeCount++;
+                }
+              }
+            }
+          }
+        });
+
+        if (positiveCount > negativeCount) {
+          return this.emotionWords.positive;
+        } else if (negativeCount > positiveCount) {
+          return this.emotionWords.negative;
+        }
+        return this.emotionWords.neutral;
+      }
+    };
 
     // 状态管理
     let currentQuestion = 0;
@@ -668,9 +1019,19 @@
           nextQuestion();
         }, 500);
       } else {
-        // 测试完成，跳转到加载页
+        // 测试完成，生成分享提示词
+        const generatedPrompt = promptBuilder.buildPrompt(answers);
+        const emotionalTone = promptBuilder.getEmotionalTone(answers);
+        console.log('生成分享提示词:', generatedPrompt);
+        console.log('情感倾向:', emotionalTone);
+
+        // 存储提示词供后续使用（可以传递给图像生成API）
+        window.generatedPrompt = generatedPrompt;
+        window.emotionalTone = emotionalTone;
+
+        // 跳转到加载页
         showPage('loading');
-        
+
         // 3秒后跳转到结果页
         setTimeout(() => {
           showPage('result');
@@ -697,12 +1058,12 @@
     // 更新问题
     function updateQuestion() {
       // 更新问题文本
-      document.getElementById('question-text').textContent = questions[currentQuestion].question;
-      
+      document.getElementById('question-text').textContent = questions[currentQuestion].title;
+
       // 更新选项
       const optionsList = document.querySelector('.options-list');
       optionsList.innerHTML = '';
-      
+
       questions[currentQuestion].options.forEach((option, index) => {
         const optionItem = document.createElement('div');
         optionItem.className = `option-item ${answers[currentQuestion] === index ? 'selected' : ''}`;
@@ -711,16 +1072,16 @@
           <div class="option-radio">
             <div class="option-radio-inner"></div>
           </div>
-          <span>${option}</span>
+          <span style="word-wrap: break-word; word-break: normal; white-space: normal;">${option.label}</span>
         `;
         optionsList.appendChild(optionItem);
       });
-      
+
       // 更新进度
       const progressPercent = ((currentQuestion + 1) / questions.length) * 100;
       document.getElementById('progress-fill').style.width = `${progressPercent}%`;
       document.getElementById('progress-text').textContent = `${currentQuestion + 1}/${questions.length}`;
-      
+
       // 更新上一题按钮状态
       document.getElementById('prev-btn').disabled = currentQuestion === 0;
     }
